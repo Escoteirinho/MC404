@@ -441,6 +441,8 @@ void pack(InstData *data) {
         int imm_temp;
         data->opcode = aplicar_mask(data->opcode, 8);
         pack = somar_bin(pack, data->opcode, 0);
+        imm_temp = aplicar_mask(data->imm >> 11, 2);
+        pack = somar_bin(pack, imm_temp, 7);
         imm_temp = aplicar_mask(data->imm >> 1, 5);
         pack = somar_bin(pack, imm_temp, 8);
         data->funct3 = aplicar_mask(data->funct3, 4);
@@ -449,8 +451,10 @@ void pack(InstData *data) {
         pack = somar_bin(pack, data->rs1, 15);
         data->rs2 = aplicar_mask(data->rs2, 6);
         pack = somar_bin(pack, data->rs2, 20);
-        data->imm = aplicar_mask(data->imm >> 5, 7);
-        pack = somar_bin(pack, data->imm, 25);
+        imm_temp = aplicar_mask(data->imm >> 5, 7);
+        pack = somar_bin(pack, imm_temp, 25);
+        data->imm = aplicar_mask(data->imm >> 12, 2);
+        pack = somar_bin(pack, data->imm, 31);
     }
     else if(data->type == U) {
         data->opcode = aplicar_mask(data->opcode, 8);
@@ -468,9 +472,12 @@ void pack(InstData *data) {
         pack = somar_bin(pack, data->rd, 7);
         imm_temp = aplicar_mask(data->imm >> 12, 9);
         pack = somar_bin(pack, imm_temp, 12);
-        data->imm = aplicar_mask(data->imm >> 1, 11);
-        pack = somar_bin(pack, data->imm, 21);
-        pack = somar_bin(pack, 0b11111111111111111111111111111111, 31);
+        imm_temp = aplicar_mask(data->imm >> 11, 2);
+        pack = somar_bin(pack, imm_temp, 20);
+        imm_temp = aplicar_mask(data->imm >> 1, 11);
+        pack = somar_bin(pack, imm_temp, 21);
+        data->imm = aplicar_mask(data->imm >> 20, 2);
+        pack = somar_bin(pack, data->imm, 31);
     }
     hex_code(pack);
 }
