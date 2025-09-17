@@ -85,7 +85,7 @@ void hex_code(int val) {
             hex[i] = aux + '0';
         uval = uval / 16;
     }
-    write(STDOUT_FD, hex, 11);
+    write(1, hex, 11);
 }
 
 int main () {
