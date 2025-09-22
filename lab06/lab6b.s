@@ -175,9 +175,9 @@ calcular_distancias:
     ret
 
 babylonian_method:
-    div s4, s6, a0      # s4 = (quadrado)/k
+    div s4, s6, a0                  # s4 = (quadrado)/k
     add a0, a0, s4     
-    div a0, a0, s2      # k' = (k + (quadrado)/k)/2
+    div a0, a0, s2                  # k' = (k + (quadrado)/k)/2
     addi s7, s7, 1
     bne s7, s5, babylonian_method
     ret
@@ -192,10 +192,29 @@ confere_x:
     mul t0, a6, a6
     add s4, s4, t0                  # Armazena (x_positivo - Xc)^2 + y^2
     add s5, s5, t0                  # Armazena (x_negativo - Xc)^2 + y^2
-    sub s4, s4, a3
-    sub s5, s5, a3
+    sub s4, s4, a5
+    sub s5, s5, a5
+    addi s7, s4, 0
+    addi a0, ra, 0
+    jal tornar_positivo
+    addi ra, a0, 0
+    addi s4, s7, 0
+    addi s7, s5, 0
+    addi a0, ra, 0
+    jal tornar_positivo
+    addi ra, a0, 0
+    addi s5, s7, 0
     blt s4, s5, x_positivo
     bge s4, s5, x_negativo
+
+tornar_positivo:
+    bge s7, zero, retornar
+    li t0, -1
+    mul s7, s7, t0
+    ret
+
+retornar:
+    ret
 
 x_positivo:                         # Retorna x positivo para s3
     ret
@@ -270,7 +289,7 @@ main:
     mul t0, a6, a6
     sub s6, a3, t0
     li s2, 2
-    div a0, s6, s2                 # k = (quadrado)/2
+    div a0, s6, s2                  # k = (quadrado)/2
     jal babylonian_method
     addi s3, a0, 0
     jal confere_x
