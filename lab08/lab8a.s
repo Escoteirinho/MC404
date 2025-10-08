@@ -214,12 +214,14 @@ main:
     sw a0, 4(sp)        # Salva a0: fd de image.pgm
     sw a1, 0(sp)        # Salva a1: line_file
     addi a4, a7, 0
-    addi a6, a6, 0
     li a7, 0
     li a5, 0
     li a3, 48
     li t1, 0
     jal cal_pgm
+    li a0, 1
+    li a1, 1
+    jal setScaling
     lw a1, 0(sp)        # Recupera a1: line_file
     lw a0, 4(sp)        # Recupera a0: fd de image.pgm
     addi sp, sp, 16
