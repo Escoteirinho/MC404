@@ -1,7 +1,6 @@
 .data
 input_file: .asciz "image.pgm"
 line_file: .space 262200
-input_cabecalho: .space 14
 
 .text
 .globl _start
@@ -148,11 +147,8 @@ cal_linha:
 
 cal_cinza:
     addi a1, a1, 1
-    lb t0, 0(a1)
+    lbu t0, 0(a1)
     li a3, 32
-    beq t0, a3, cal_cinza
-    li a3, 10
-    beq t0, a3, cal_cinza
     add a7, a7, t0
     slli a7, a7, 8      # Concatenando Blue
     addi a2, a7, 0
@@ -219,9 +215,6 @@ main:
     li a3, 48
     li t1, 0
     jal cal_pgm
-    li a0, 1
-    li a1, 1
-    jal setScaling
     lw a1, 0(sp)        # Recupera a1: line_file
     lw a0, 4(sp)        # Recupera a0: fd de image.pgm
     addi sp, sp, 16
