@@ -7,12 +7,15 @@ user_stack:                 # Final da pilha do programa do usuario
 user_stack_end:             # Base da pilha do programa do usuario
 
 .data
-.equ address_car, 
+.equ    address_car,    0xFFFF0100
 
 .text
 .align 4
 
 int_handler:
+# Determina qual syscall dever ser realizada
+    li  t0, 11 
+    beq a7, t0, syscall_set_hand_brake
 
 syscall_set_engine_and_steering:
 # Salva o contexto
@@ -22,9 +25,7 @@ syscall_set_engine_and_steering:
 # Set a direção do movimento e ângulo do volante
     li  t0, address_car
     sb  a0, 0x21(t0)
-    sw  a1, 0x20(t0)
-    li  a0, 1
-    sb  a0, 0(t0)
+    sb  a1, 0x20(t0)
 # Ajustando MEPC para retornar de uma chamada de sistema
     csrr t0, mepc               # carrega endereço de retorno (endereço da instrução que invocou a syscall)
     addi t0, t0, 4              # soma 4 no endereço de retorno (para retornar após a ecall)
@@ -73,12 +74,25 @@ _start:
     ori t1, t1, 0x8     
     csrw    mstatus, t1
 # Configura a pilha do programa do usuario
-    li  sp, user_stack_end
+    la  sp, user_stack_end
 # Muda o codigo para modo de usuario
-
-# Chama a main
-    jal user_main
+    csrr t1, mstatus    # Update the mstatus.MPP
+    li t2, ~0x1800      # field (bits 11 and 12)
+    and t1, t1, t2      # with value 00 (U-mode)
+    csrw mstatus, t1
+    la t0, user_main    # Loads the user software
+    csrw mepc, t0       # entry point into mepc
+# Pula para o endereço de user_main
+    mret                # PC <= MEPC; mode <= MPP
 
 .globl control_logic
 control_logic:
-  # implement your control logic here, using only the defined syscalls
+    li a0, 0
+    li a7, 11
+    ecall
+    li a0, 1
+    li a1, -15
+    li a7, 10
+    ecall
+    ret
+
